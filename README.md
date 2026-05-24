@@ -56,8 +56,6 @@ The lab spans four isolated virtual network zones. All inter-zone traffic is rou
 
 ![ANAOS Network Topology](docs/images/topology.png)
 
-> **To add this image:** save your network diagram as `docs/images/topology.png` in the repo.
-
 | Zone | Hosts | Purpose |
 |---|---|---|
 | WAN | Kali Linux | Attacker machine (Nmap, Hydra, SQLmap) |
@@ -71,7 +69,6 @@ Events flow from endpoints through Wazuh agents to the manager, where they are c
 
 ![ANAOS Data Pipeline](docs/images/Pipeline.png)
 
-> **To add this image:** save your data pipeline flowchart as `docs/images/pipeline.png` in the repo.
 
 - **Windows Sysmon** events travel via Wazuh agent over encrypted TCP (port 1514)
 - **Linux Auditd** records are tailed by the agent's `localfile` directive
@@ -90,7 +87,7 @@ Events flow from endpoints through Wazuh agents to the manager, where they are c
 | [Sysmon](https://learn.microsoft.com/sysinternals/downloads/sysmon) | v14 | Windows host telemetry (EID 1, 3, 10) |
 | [Auditd](https://linux.die.net/man/8/auditd) | — | Linux host telemetry |
 | [Ansible](https://docs.ansible.com) | — | Zero-touch infrastructure provisioning |
-| `anaos_gui.py` | — | Python analyst dashboard (this repo) |
+| `anaos_gui.py` | — | Python analyst dashboard |
 
 ---
 
@@ -194,8 +191,6 @@ Default credentials: `admin / anaos2025` (change in `anaos_gui.py` before deploy
 Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
 
 ![ANAOS Dashboard](docs/images/Dashboard.png)
-
-> **To add this image:** take a screenshot of your running dashboard and save it as `docs/images/dashboard.png`.
 
 ---
 
@@ -323,8 +318,8 @@ anaos/
 
 ## Authors
 
-| Name | Role |
-|---|---|
+| Name | 
+|---|
 | Ismail BAJJOU | 
 | Ousmane ISSA ADAM | 
 | Othmane NECHCHADI | 
