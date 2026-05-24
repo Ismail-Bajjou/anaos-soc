@@ -286,14 +286,12 @@ anaos/
 │   └── anaos.rules
 ├── dashboard/
 │   ├── anaos_gui.py
-│   └── requirements.txt
 ├── docs/
 │   ├── images/
 │   │   ├── topology.png        ← network topology diagram
 │   │   ├── pipeline.png        ← data pipeline flowchart
 │   │   └── dashboard.png       ← dashboard screenshot
 │   └── ANAOS_Research_Chapter.pdf
-├── .gitignore
 └── README.md
 ```
 
@@ -333,6 +331,7 @@ ENSA Khouribga · Cybersecurity Research · 2025–2026
 
 ## License
 
+Full results from the experimental session are documented in the [research paper](docs/ANAOS_Research_Chapter.pdf).
 This project is released under the [MIT License](LICENSE).
 
 > Built with open-source tools. Tested in a controlled virtual lab. Use responsibly.
