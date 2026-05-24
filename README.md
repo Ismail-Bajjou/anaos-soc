@@ -108,7 +108,7 @@ Events flow from endpoints through Wazuh agents to the manager, where they are c
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Ismail-Bajjou/anaos-soc.git
-cd anaos
+cd anaos-soc
 
 # 2. Configure your inventory
 cp ansible/inventory.ini.example ansible/inventory.ini
