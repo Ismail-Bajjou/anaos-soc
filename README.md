@@ -69,7 +69,7 @@ The lab spans four isolated virtual network zones. All inter-zone traffic is rou
 
 Events flow from endpoints through Wazuh agents to the manager, where they are correlated against custom rules and surfaced in the ANAOS dashboard.
 
-![ANAOS Data Pipeline](docs/images/pipeline.png)
+![ANAOS Data Pipeline](docs/images/Pipeline.png)
 
 > **To add this image:** save your data pipeline flowchart as `docs/images/pipeline.png` in the repo.
 
