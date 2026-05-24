@@ -1,0 +1,57 @@
+# ================================================================
+# ANAOS — Ansible Playbook: Wazuh Agent on Linux Endpoints
+# File   : ansible/playbooks/deploy_wazuh_agent_linux.yml
+# Targets: DMZ (Juice Shop) + LAN1 Ubuntu endpoint
+# Usage  : ansible-playbook -i inventory.ini \
+#            -e "wazuh_manager=<IP> wazuh_version=4.9.0-1" \
+#            playbooks/deploy_wazuh_agent_linux.yml
+# ================================================================
+---
+- name: Deploy Wazuh Agent — Linux
+  hosts: linux_endpoints
+  become: true
+
+  vars:
+    wazuh_manager: "{{ wazuh_manager_ip }}"
+    wazuh_version: "4.9.0-1"
+
+  tasks:
+
+    - name: Add Wazuh GPG key
+      ansible.builtin.apt_key:
+        url: "https://packages.wazuh.com/key/GPG-KEY-WAZUH"
+        state: present
+
+    - name: Add Wazuh APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb https://packages.wazuh.com/4.x/apt/ stable main"
+        state: present
+        update_cache: true
+
+    - name: Install wazuh-agent package
+      ansible.builtin.apt:
+        name: "wazuh-agent={{ wazuh_version }}"
+        state: present
+
+    - name: Set Wazuh Manager IP in ossec.conf
+      ansible.builtin.lineinfile:
+        path: /var/ossec/etc/ossec.conf
+        regexp: '<address>.*</address>'
+        line: "    <address>{{ wazuh_manager }}</address>"
+        backrefs: true
+
+    - name: Enable and start Wazuh agent service
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Verify agent is running
+      ansible.builtin.command: /var/ossec/bin/wazuh-control status
+      register: agent_status
+      changed_when: false
+
+    - name: Print agent status
+      ansible.builtin.debug:
+        msg: "{{ agent_status.stdout }}"
