@@ -1,0 +1,81 @@
+# ================================================================
+# ANAOS — Ansible Playbook: Auditd Configuration on Ubuntu
+# File   : ansible/playbooks/configure_auditd.yml
+# Targets: DMZ (Juice Shop) + LAN1 Ubuntu endpoint
+# Usage  : ansible-playbook -i inventory.ini \
+#            playbooks/configure_auditd.yml
+# ================================================================
+---
+- name: Configure Auditd — Ubuntu
+  hosts: linux_endpoints
+  become: true
+
+  tasks:
+
+    - name: Ensure auditd is installed
+      ansible.builtin.apt:
+        name: auditd
+        state: present
+        update_cache: true
+
+    - name: Ensure auditd service is enabled
+      ansible.builtin.systemd:
+        name: auditd
+        enabled: true
+
+    - name: Push ANAOS audit rules
+      ansible.builtin.copy:
+        dest: /etc/audit/rules.d/anaos.rules
+        owner: root
+        group: root
+        mode: '0640'
+        content: |
+          ## ============================================================
+          ## ANAOS Audit Rules — /etc/audit/rules.d/anaos.rules
+          ## ============================================================
+
+          # --- Execution events ---
+          # Capture all execve syscalls (process execution)
+          -a always,exit -F arch=b64 -S execve -k exec_cmd
+          -a always,exit -F arch=b32 -S execve -k exec_cmd
+
+          # --- Sensitive file access ---
+          # Watch reads on /etc/passwd and /etc/shadow
+          -w /etc/passwd -p r -k sensitive_read
+          -w /etc/shadow -p r -k sensitive_read
+          -w /etc/sudoers -p rw -k sensitive_read
+
+          # --- Privilege escalation indicators ---
+          # Capture setuid / setgid calls
+          -a always,exit -F arch=b64 -S setuid -S setgid -k priv_change
+          -a always,exit -F arch=b32 -S setuid -S setgid -k priv_change
+
+          # --- Network configuration changes ---
+          -a always,exit -F arch=b64 -S sethostname -k net_cfg
+
+          # --- Crontab modifications ---
+          -w /var/spool/cron -p wa -k cron_change
+          -w /etc/cron.d -p wa -k cron_change
+
+          # --- Module loading (rootkit indicator) ---
+          -w /sbin/insmod -p x -k module_load
+          -w /sbin/modprobe -p x -k module_load
+
+    - name: Reload audit rules
+      ansible.builtin.command: augenrules --load
+      register: augenrules_result
+      changed_when: "'No change' not in augenrules_result.stdout"
+
+    - name: Restart auditd
+      ansible.builtin.systemd:
+        name: auditd
+        state: restarted
+
+    - name: Verify rules are loaded
+      ansible.builtin.command: auditctl -l
+      register: audit_rules
+      changed_when: false
+
+    - name: Print loaded rules
+      ansible.builtin.debug:
+        msg: "{{ audit_rules.stdout_lines }}"
