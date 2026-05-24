@@ -185,7 +185,7 @@ cd dashboard
 python3 anaos_gui.py
 # Open http://localhost:8080 in your browser```
 Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
-
+```
 ![ANAOS Dashboard](docs/images/Dashboard.png)
 
 ---
