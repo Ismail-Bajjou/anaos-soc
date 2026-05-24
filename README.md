@@ -107,7 +107,7 @@ Events flow from endpoints through Wazuh agents to the manager, where they are c
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/anaos.git
+git clone https://github.com/Ismail-Bajjou/anaos.git
 cd anaos
 
 # 2. Configure your inventory
