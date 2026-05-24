@@ -131,7 +131,6 @@ systemctl restart wazuh-manager
 
 # 8. Launch the dashboard
 cd dashboard
-pip install -r requirements.txt
 python3 anaos_gui.py
 # Open http://localhost:8080 in your browser
 ```
@@ -185,9 +184,6 @@ The dashboard reads `/var/ossec/logs/alerts/alerts.json` on the Wazuh Manager. R
 cd dashboard
 python3 anaos_gui.py --port 8080 --alerts /var/ossec/logs/alerts/alerts.json
 ```
-
-Default credentials: `admin / anaos2025` (change in `anaos_gui.py` before deployment).
-
 Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
 
 ![ANAOS Dashboard](docs/images/Dashboard.png)
