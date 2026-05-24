@@ -183,9 +183,10 @@ The dashboard reads `/var/ossec/logs/alerts/alerts.json` on the Wazuh Manager. R
 ```bash
 cd dashboard
 python3 anaos_gui.py
-# Open http://localhost:8080 in your browser```
-Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
+# Open http://localhost:8080 in your browser
 ```
+Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
+
 ![ANAOS Dashboard](docs/images/Dashboard.png)
 
 ---
@@ -285,8 +286,8 @@ anaos/
 ├── docs/
 │   ├── images/
 │   │   ├── topology.png        ← network topology diagram
-│   │   ├── pipeline.png        ← data pipeline flowchart
-│   │   └── dashboard.png       ← dashboard screenshot
+│   │   ├── Pipeline.png        ← data pipeline flowchart
+│   │   └── Dashboard.png       ← dashboard screenshot
 │   └── ANAOS_Research_Chapter.pdf
 └── README.md
 ```
@@ -327,7 +328,6 @@ ENSA Khouribga · Cybersecurity Research · 2025–2026
 
 ## License
 
-Full results from the experimental session are documented in the [research paper](docs/ANAOS_Research_Chapter.pdf).
 This project is released under the [MIT License](LICENSE).
 
 > Built with open-source tools. Tested in a controlled virtual lab. Use responsibly.
