@@ -50,23 +50,33 @@ ANAOS addresses three core barriers that prevent small and medium enterprises fr
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  WAN                          │  DMZ                            │
-│  Kali Linux (Attacker)        │  OWASP Juice Shop               │
-│                               │  Ubuntu 22.04                   │
-│                               │  Wazuh Agent + Auditd           │
-├───────────────────────────────┼─────────────────────────────────┤
-│         pfSense Firewall / Suricata IDS (inter-zone)            │
-├───────────────────────────────┬─────────────────────────────────┤
-│  LAN1 — Internal Endpoints   │  LAN2 — SOC Servers             │
-│  Windows 10 (Sysmon + Agent) │  Wazuh Manager v4.9             │
-│  Ubuntu 22.04 (Auditd+Agent) │  Ansible Server                 │
-│                               │  ANAOS Dashboard (port 8080)    │
-└───────────────────────────────┴─────────────────────────────────┘
-```
+### Network Topology
 
-All inter-zone traffic routes exclusively through pfSense running Suricata IDS in inline mode.
+The lab spans four isolated virtual network zones. All inter-zone traffic is routed exclusively through pfSense running Suricata IDS in inline inspection mode.
+
+![ANAOS Network Topology](docs/images/topology.png)
+
+> **To add this image:** save your network diagram as `docs/images/topology.png` in the repo.
+
+| Zone | Hosts | Purpose |
+|---|---|---|
+| WAN | Kali Linux | Attacker machine (Nmap, Hydra, SQLmap) |
+| DMZ | OWASP Juice Shop (Ubuntu 22.04) | Vulnerable web app target + Wazuh Agent + Auditd |
+| LAN1 | Windows 10, Ubuntu 22.04 | Monitored endpoints (Sysmon, Auditd, Wazuh Agents) |
+| LAN2 | Wazuh Manager, Ansible Server | SOC infrastructure + ANAOS dashboard |
+
+### Data Pipeline
+
+Events flow from endpoints through Wazuh agents to the manager, where they are correlated against custom rules and surfaced in the ANAOS dashboard.
+
+![ANAOS Data Pipeline](docs/images/pipeline.png)
+
+> **To add this image:** save your data pipeline flowchart as `docs/images/pipeline.png` in the repo.
+
+- **Windows Sysmon** events travel via Wazuh agent over encrypted TCP (port 1514)
+- **Linux Auditd** records are tailed by the agent's `localfile` directive
+- **Suricata** writes EVE-JSON alerts forwarded via UDP syslog (port 514) to the Wazuh Manager for agentless ingestion
+- Alerts at level ≥ 3 are written to `alerts.json` and parsed in real time by `anaos_gui.py`
 
 ---
 
@@ -181,6 +191,12 @@ python3 anaos_gui.py --port 8080 --alerts /var/ossec/logs/alerts/alerts.json
 
 Default credentials: `admin / anaos2025` (change in `anaos_gui.py` before deployment).
 
+Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
+
+![ANAOS Dashboard](docs/images/dashboard.png)
+
+> **To add this image:** take a screenshot of your running dashboard and save it as `docs/images/dashboard.png`.
+
 ---
 
 ## Detection Rules
@@ -277,6 +293,10 @@ anaos/
 │   ├── anaos_gui.py
 │   └── requirements.txt
 ├── docs/
+│   ├── images/
+│   │   ├── topology.png        ← network topology diagram
+│   │   ├── pipeline.png        ← data pipeline flowchart
+│   │   └── dashboard.png       ← dashboard screenshot
 │   └── ANAOS_Research_Chapter.pdf
 ├── .gitignore
 └── README.md
@@ -305,11 +325,11 @@ anaos/
 
 | Name | Role |
 |---|---|
-| Ismail BAJJOU | Lead Engineer |
-| Ousmane ISSA ADAM | Detection Engineering |
-| Othmane NECHCHADI | Infrastructure & Ansible |
-| Yassine SARIH | Dashboard Development |
-| Akram ZERBANE | Experimental Evaluation |
+| Ismail BAJJOU | 
+| Ousmane ISSA ADAM | 
+| Othmane NECHCHADI | 
+| Yassine SARIH | 
+| Akram ZERBANE | 
 
 Supervised by **Dr. Yassine Maleh**
 ENSA Khouribga · Cybersecurity Research · 2025–2026
