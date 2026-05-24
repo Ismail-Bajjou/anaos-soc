@@ -1,0 +1,48 @@
+# ================================================================
+# ANAOS — Custom Suricata Rules
+# File   : anaos.rules
+# Place  : /usr/local/etc/suricata/rules/anaos.rules  (pfSense)
+#          or upload via pfSense UI: Services > Suricata > Rules
+# These SIDs are the parent events that Wazuh rules 100115 and
+# 100116 chain on. Both rules must be enabled in Suricata for
+# the Wazuh detection chain to fire.
+# ================================================================
+
+# ----------------------------------------------------------------
+# SID 86600 | T1110 — Brute Force: Web Login
+# Detects rapid HTTP POST requests to the login endpoint.
+# Threshold: 10 requests within 5 seconds from the same source IP.
+# ----------------------------------------------------------------
+alert http $EXTERNAL_NET any -> $HTTP_SERVERS any (
+  msg:"Web Login Brute Force";
+  flow:established,to_server;
+  http.method; content:"POST";
+  http.uri; content:"/rest/user/login";
+  threshold: type threshold, track by_src, count 10, seconds 5;
+  classtype:attempted-user;
+  sid:86600;
+  rev:1;
+  metadata:attack_target Web_Server, affected_product Juice_Shop,
+            mitre_tactic_id TA0006, mitre_tactic_name Credential_Access,
+            mitre_technique_id T1110, mitre_technique_name Brute_Force;
+)
+
+# ----------------------------------------------------------------
+# SID 86601 | T1190 — Exploit Public-Facing Application (SQLi)
+# Detects SQL injection metacharacters in HTTP POST body.
+# PCRE matches common SQL injection patterns including OR-based,
+# UNION-based, and comment-terminated payloads.
+# ----------------------------------------------------------------
+alert http $EXTERNAL_NET any -> $HTTP_SERVERS any (
+  msg:"ANAOS - SQL Injection Attempt";
+  flow:established,to_server;
+  http.method; content:"POST";
+  http.request_body;
+  pcre:"/(\%27|\'|(\-\-)|(%23)|(#)|(\/\*)|union.*select|select.*from|insert.*into|drop.*table|or\s+1\s*=\s*1)/i";
+  classtype:web-application-attack;
+  sid:86601;
+  rev:1;
+  metadata:attack_target Web_Server, affected_product Juice_Shop,
+            mitre_tactic_id TA0001, mitre_tactic_name Initial_Access,
+            mitre_technique_id T1190, mitre_technique_name Exploit_Public_Facing_Application;
+)
