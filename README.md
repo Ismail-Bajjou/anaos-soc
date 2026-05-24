@@ -107,7 +107,7 @@ Events flow from endpoints through Wazuh agents to the manager, where they are c
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Ismail-Bajjou/anaos.git
+git clone https://github.com/Ismail-Bajjou/anaos-soc.git
 cd anaos
 
 # 2. Configure your inventory
@@ -182,8 +182,8 @@ The dashboard reads `/var/ossec/logs/alerts/alerts.json` on the Wazuh Manager. R
 
 ```bash
 cd dashboard
-python3 anaos_gui.py --port 8080 --alerts /var/ossec/logs/alerts/alerts.json
-```
+python3 anaos_gui.py
+# Open http://localhost:8080 in your browser```
 Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
 
 ![ANAOS Dashboard](docs/images/Dashboard.png)
