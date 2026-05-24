@@ -193,7 +193,7 @@ Default credentials: `admin / anaos2025` (change in `anaos_gui.py` before deploy
 
 Once running, the dashboard provides real-time alert triage, ATT&CK-tagged enrichment, and live MTTD / FPR computation:
 
-![ANAOS Dashboard](docs/images/dashboard.png)
+![ANAOS Dashboard](docs/images/Dashboard.png)
 
 > **To add this image:** take a screenshot of your running dashboard and save it as `docs/images/dashboard.png`.
 
