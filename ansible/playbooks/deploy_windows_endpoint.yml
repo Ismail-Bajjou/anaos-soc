@@ -1,0 +1,69 @@
+# ================================================================
+# ANAOS — Ansible Playbook: Wazuh Agent + Sysmon on Windows
+# File   : ansible/playbooks/deploy_windows_endpoint.yml
+# Targets: LAN1 Windows 10 endpoint
+# Prereqs:
+#   - WinRM enabled on target (run: Enable-PSRemoting -Force)
+#   - Place Sysmon64.exe + sysmonconfig.xml in ansible/files/
+#   - Host wazuh-agent-4.x.x-1.msi on a reachable file share
+# Usage  : ansible-playbook -i inventory.ini \
+#            -e "wazuh_manager=<IP>" \
+#            playbooks/deploy_windows_endpoint.yml
+# ================================================================
+---
+- name: Deploy Wazuh Agent and Sysmon — Windows
+  hosts: windows_endpoints
+  gather_facts: false
+
+  vars:
+    wazuh_manager: "{{ wazuh_manager_ip }}"
+    sysmon_installer: 'C:\Temp\Sysmon64.exe'
+    sysmon_config: 'C:\Temp\sysmonconfig.xml'
+    wazuh_msi_share: '\\<FILE_SERVER>\wazuh-agent-4.9.0-1.msi'
+
+  tasks:
+
+    - name: Ensure C:\Temp exists
+      ansible.windows.win_file:
+        path: 'C:\Temp'
+        state: directory
+
+    - name: Install Wazuh agent (MSI)
+      ansible.windows.win_package:
+        path: "{{ wazuh_msi_share }}"
+        arguments: >
+          WAZUH_MANAGER="{{ wazuh_manager }}"
+          WAZUH_REGISTRATION_SERVER="{{ wazuh_manager }}"
+        state: present
+
+    - name: Copy Sysmon64 binary to target
+      ansible.windows.win_copy:
+        src: files/Sysmon64.exe
+        dest: "{{ sysmon_installer }}"
+
+    - name: Copy SwiftOnSecurity Sysmon config to target
+      ansible.windows.win_copy:
+        src: files/sysmonconfig.xml
+        dest: "{{ sysmon_config }}"
+
+    - name: Install Sysmon with config (idempotent)
+      ansible.windows.win_command: >
+        "{{ sysmon_installer }}" -accepteula -i "{{ sysmon_config }}"
+      args:
+        creates: 'C:\Windows\Sysmon64.exe'
+
+    - name: Ensure Wazuh agent service is running
+      ansible.windows.win_service:
+        name: WazuhSvc
+        state: started
+        start_mode: auto
+
+    - name: Verify Sysmon service is running
+      ansible.windows.win_service:
+        name: Sysmon64
+        state: started
+        start_mode: auto
+
+    - name: Print confirmation
+      ansible.builtin.debug:
+        msg: "Wazuh agent and Sysmon deployed successfully on {{ inventory_hostname }}"
